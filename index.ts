@@ -107,7 +107,7 @@ client.on(Events.MessageCreate, async (message) => {
                     "type": "text",
                     "text": message.content
                 },
-                ...[...message.attachments.values()].map(attachment => (
+                ...[...message.attachments.values()].filter(attachment => attachment.contentType === "image/png" || attachment.contentType === "image/jpeg").map(attachment => (
                     {
                         "type": "image_url",
                         "image_url": {
@@ -116,6 +116,7 @@ client.on(Events.MessageCreate, async (message) => {
                     }
                 ))
             ])
+            if (!moderation || !moderation.results) return
             let flagged = false
             for (const result of moderation.results) {
                 for (const score of Object.values(result.category_scores)) {
