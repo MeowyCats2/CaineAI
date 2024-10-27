@@ -45,6 +45,7 @@ const generateContext = async (channel: TextChannel) => {
 }
 
 client.on(Events.MessageCreate, async (message) => {
+    if (message.author.id === client.user!.id) return
     if (message.mentions.has(client.user!)) {
         try {
             message.channel.sendTyping()
@@ -117,9 +118,12 @@ client.on(Events.MessageCreate, async (message) => {
             ])
             let flagged = false
             for (const result of moderation.results) {
-                if (result.flagged) flagged = true
+                for (const score of Object.values(result.category_scores)) {
+                    if (score as number > 0.9) flagged = true
+                }
             }
             if (!flagged) return
+            console.log(JSON.stringify(moderation, null, 4))
             message.channel.sendTyping()
             await message.reply((await complete([startingMessage, {"role": "user", "content": message.content}, {"role": "system", "content": `Write a response to the above message, telling them not to send a naughty message. Explain how the message could be interpreted as inappropriate. The author of the above message is "${(await message.guild!.members.fetch(message.author.id)).displayName}".`}])).choices[0].message.content)
             await message.delete()
