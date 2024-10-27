@@ -32,7 +32,7 @@ const generateContext = async (channel: TextChannel) => {
     const messages: OpenAIMessage[] = []
     for (const [id, msg] of [...history]) {
         if (messages.join("").length + msg.content.length > 10000) break
-        const displayName = (await msg.guild.members.fetch(msg.author.id)).displayName
+        const displayName = msg.author.displayName
         const sanitized = displayName.replaceAll(" ", "_").replaceAll(/[^a-zA-Z0-9_\-]/g, "").substring(0, 64) || displayName.split("").map((c, i) => "U-" + displayName.charCodeAt(i)).join("_").substring(0, 64)
         if (msg.author.id !== client.user!.id) {
             messages.unshift({"role": "system", "content": `The below message was sent by "${displayName}"`})
